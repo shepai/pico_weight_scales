@@ -12,7 +12,7 @@ import analogio
 from digitalio import DigitalInOut, Direction, Pull
 #data store
 storage.remount("/",readonly=0)
-filename="grams_120.csv"
+fileform="grams_$.csv"
 # Initialize analog input on pin A0 (which is GP26 on the Raspberry Pi Pico)
 analog_in = analogio.AnalogIn(board.GP26)
 record = DigitalInOut(board.GP16)
@@ -30,6 +30,7 @@ def get_voltage(pin):
 
 recording=False
 file=None
+files=0
 while True:
     raw_value = analog_in.value  # Get raw ADC value (0 to 65535)
     voltage = get_voltage(analog_in)  # Convert to voltage
@@ -40,11 +41,14 @@ while True:
             file.close()
             file=None
         else:
+            filename=fileform.replace("$",str(files))
             file=open(filename,"w")
+            files+=1
     print([record.value,raw_value])
     #print(f"Raw ADC: {raw_value}, Voltage: {voltage:.2f}V")  # Print values
     #print(raw_value)
     if recording:
         file.write(str(voltage)+"\n")
     time.sleep(0.2)  # Delay to avoid flooding output
+
 
